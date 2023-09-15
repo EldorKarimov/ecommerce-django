@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, render
-from django.http import HttpResponse
+from django.core.paginator import Paginator
+from django.db.models import Q
 
 from .models import Product
 from category.models import Category
@@ -10,15 +11,31 @@ def store(request, slug=None):
     categories = None
     product = None
     if slug is not None:
-        category = get_object_or_404(Category, slug=slug)
-        product = Product.objects.filter(category=category, is_available=True)
-        product_count = product.count()
+        search_item = request.GET.get('search_product')
+        if search_item:
+            product = Product.objects.filter(product_name__icontains=search_item, is_available=True)
+        else:
+            category = get_object_or_404(Category, slug=slug)
+            product = Product.objects.filter(category=category, is_available=True)
+        paginator = Paginator(product, 2)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        product_count = paginator.count
     else:
-        product = Product.objects.filter(is_available=True)
-        product_count = product.count()
+        search_item = request.GET.get('search_product')
+        
+        if search_item:
+            product = Product.objects.filter(is_available=True, product_name__icontains=search_item)
+        else:
+            product = Product.objects.filter(is_available=True)
+        
+        paginator = Paginator(product, 2)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        product_count = page_obj.object_list.count
         
     context = {
-        'products':product,
+        'products':page_obj,
         'product_count':product_count,
     }
     return render(request, 'store/store.html', context)
@@ -34,4 +51,4 @@ def product_detail(request, category_slug, product_slug):
         'product':product,
         'in_cart':in_cart
     }
-    return render(request, 'store/store_detail.html', context)
+    return render(request, 'store/store_detail.html', context) 

@@ -7,8 +7,11 @@
 
         <!-- ============================ COMPONENT 1 ================================= -->
         {% if not cart_items %}
-        <h1 class="text-center">your cart is empty</h1>
-        <a href="{% url 'store' %}" class="btn btn-primary">go to shop</a>
+        <div class="text-center">
+            <h1>your cart is empty</h1>
+            <a href="{% url 'store' %}" class="btn btn-primary">go to shop</a>
+        </div>
+        
         {% else %}
         <div class="row">
             <aside class="col-lg-9">
