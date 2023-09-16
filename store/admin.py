@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Product
+from .models import Product, Variation
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
@@ -11,3 +11,8 @@ class ProductAdmin(admin.ModelAdmin):
     ordering = ('-created_at',)
     filter_horizontal = ()
     list_filter = ()
+
+@admin.register(Variation)
+class VariationAdmin(admin.ModelAdmin):
+    list_display = ['variation_choice', 'variation_value', 'is_active']
+    list_editable = ('is_active', )
